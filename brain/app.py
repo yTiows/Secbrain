@@ -7,6 +7,9 @@ from .knowledge import KnowledgeStore
 from .graph import GraphEngine
 from .llm import make_llm
 from .ingest.pipeline import IngestionEngine
+from .retrieval import RetrievalEngine
+from .maintenance import MaintenanceEngine
+from .evolution import Evolution
 
 
 class Brain:
@@ -19,7 +22,11 @@ class Brain:
         self.graph = GraphEngine(self.db, self.store)
         self.llm = make_llm()
         self.ingest = IngestionEngine(self.db, self.store, self.graph, self.settings, self.llm)
+        self.retrieval = RetrievalEngine(self.db, self.store, self.graph, self.settings)
+        self.maintenance = MaintenanceEngine(self.db, self.store, self.graph, self.settings, self.ingest.rel)
+        self.evolution = Evolution(self.db, self.store, self.graph, self.settings)
 
     def close(self):
         self.ingest.stop()
+        self.maintenance.stop()
         self.db.close()
