@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "fpdf2>=2.7"]
+phone = ["qrcode>=7.4", "pillow>=10"]
 
 [project.scripts]
 brain = "brain.cli:main"

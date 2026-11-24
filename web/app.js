@@ -234,5 +234,18 @@
     guard(async () => { const f = await api('/maintenance/findings?status=open'); const b = $('#intelBadge'); b.hidden = !f.findings.length; b.textContent = f.findings.length; })();
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') { e.preventDefault(); show('search'); } });
   }
-  if (token) boot(); else showLogin();
+  // ---- phone automation: one-tap login link (#key=…), Web Share Target (share text/links into the vault), service worker
+  async function autoLogin() {
+    const m = /[#&]key=(brk_[\w-]+)/.exec(location.hash); if (!m) return false;
+    history.replaceState(null, '', location.pathname + location.search);          // the key never stays in the address bar/history
+    const r = await fetch(API + '/me', { headers: { Authorization: 'Bearer ' + m[1] } }); if (!r.ok) return false;
+    token = m[1]; try { localStorage.setItem('brk', token); } catch (e) {} return true;
+  }
+  async function handleShare() {
+    const q = new URLSearchParams(location.search); const text = [q.get('title'), q.get('text'), q.get('url')].filter(Boolean).join('\n\n');
+    if (!text || !token) return; history.replaceState(null, '', location.pathname);
+    try { const j = await api('/ingest/note', { json: { content: text, title: q.get('title') || null, tags: ['shared'] } }); toast(j.status === 'done' ? 'Saved to your brain ✓' : 'Share: ' + j.status, j.status === 'failed'); guard(loadGraph)(); } catch (e) { toast('Share failed: ' + e.message, true); }
+  }
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
+  (async () => { await autoLogin(); if (token) { await boot(); await handleShare(); } else showLogin(); })();
 })();

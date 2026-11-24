@@ -23,6 +23,22 @@ Open the UI, paste the admin key. Views: **Graph** (zoom/pan/filter/cluster LOD,
 (ranked results or an AI context package), **Intel** (findings, contradictions, duplicates, gaps, changes with undo), **Vault**
 (import, notes, review-before-commit, export Obsidian vault, backup, API keys).
 
+## Run it on your phone (almost no interaction)
+
+```bash
+pip install -e '.[phone]'
+python -m brain.cli up          # starts the server, opens a private HTTPS tunnel if it can, prints a QR code
+```
+1. Scan the QR with the phone camera: the link logs you in automatically (key travels in the URL fragment and is stripped after login).
+2. Browser menu → **Add to Home Screen** → it runs as an app (PWA). On Android, **Share → Secbrain** saves any text/link straight into the vault.
+3. Nothing else: the autopilot runs inside the server. It ingests anything dropped into `<data>/inbox/` (point Syncthing/iCloud/Dropbox at it; sub-folders become projects),
+   runs maintenance hourly (safe fixes auto-apply) and takes a daily backup (newest 7 kept).
+
+Tunnel choice is automatic: **Tailscale** if installed and logged in (private, recommended: install it on both devices once), else **cloudflared** quick tunnel (public URL guarded only by the key),
+else the **local network** over plain HTTP (same Wi-Fi; no app install without HTTPS). `--lan` forces the last one.
+Always-on hosting: `docker compose up -d` (set `BRAIN_PUBLIC_URL`) or `deploy/fly.sh` (needs a Fly account; prints the login link). The link is a password; revoke the `phone` key in Vault → API keys.
+*Tested here:* `brain up --lan`, QR, link login, share target and inbox in an emulated Pixel 7. *Not tested here (no Docker daemon, no Tailscale/cloudflared/Fly):* Dockerfile, compose, `fly.sh`, tunnel detection.
+
 ## External API (versioned `/api/v1`, OpenAPI at `/api/v1/docs`)
 
 ```bash

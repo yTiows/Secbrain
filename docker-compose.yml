@@ -1,0 +1,12 @@
+# docker compose up -d   →  open the "Phone login link" printed by `docker compose logs secbrain`
+# Put your public HTTPS address in BRAIN_PUBLIC_URL (Tailscale/Caddy/Cloudflare tunnel) so the printed link works on the phone.
+services:
+  secbrain:
+    build: .
+    restart: unless-stopped
+    ports: ["127.0.0.1:8765:8765"]      # loopback only: reach it through a TLS-terminating tunnel/proxy, not the open internet
+    volumes: ["secbrain-data:/data"]
+    environment:
+      BRAIN_PUBLIC_URL: ${BRAIN_PUBLIC_URL:-http://localhost:8765}
+volumes:
+  secbrain-data:

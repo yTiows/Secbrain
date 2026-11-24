@@ -105,21 +105,26 @@ class ProposalReq(BaseModel):
 
 
 def create_app(brain: Brain, *, start_workers: bool = True, maintenance_interval_s: int = 3600, serve_ui: bool = True) -> FastAPI:
+    import mimetypes
+    mimetypes.add_type("application/manifest+json", ".webmanifest")
     app = FastAPI(title="Secbrain API", version="1.0.0", docs_url=f"{API}/docs", openapi_url=f"{API}/openapi.json")
     app.state.brain = brain
     b = brain
 
     if start_workers:
+        from ..autopilot import Autopilot
+        pilot = Autopilot(b, maintenance_interval=maintenance_interval_s or 1e12)
+        app.state.autopilot = pilot
+
         @app.on_event("startup")
         def _start():
             b.ingest.start()
-            if maintenance_interval_s:
-                b.maintenance.start_scheduler(maintenance_interval_s)
+            pilot.start()
 
         @app.on_event("shutdown")
         def _stop():
             b.ingest.stop()
-            b.maintenance.stop()
+            pilot.stop()
 
     # ---------------------------------------------------------------- errors
     @app.exception_handler(NotFound)
@@ -189,6 +194,11 @@ def create_app(brain: Brain, *, start_workers: bool = True, maintenance_interval
     @app.get(f"{API}/me")
     def me(p: dict = Depends(principal)):
         return {k: p[k] for k in ("id", "name", "scopes", "projects", "types")}
+
+    @app.get(f"{API}/autopilot")
+    def autopilot_status(p: dict = Depends(need("admin"))):
+        pl = getattr(app.state, "autopilot", None)
+        return {"inbox": str(b.settings.data_dir / "inbox"), "log": pl.log if pl else [], "backups": sorted(f.name for f in b.settings.backups_dir.glob("brain-*.sqlite"))}
 
     @app.get(f"{API}/meta")
     def meta(p: dict = Depends(need("read"))):
