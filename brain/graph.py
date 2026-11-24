@@ -94,6 +94,9 @@ class GraphEngine:
                     new = dict(confidence=max(confidence, exd["confidence"]) if origin == "ai" else confidence,
                                explanation=explanation or exd["explanation"],
                                evidence={**exd["evidence"], **(evidence or {})})
+                    if origin != "ai" and exd["origin"] == "ai":                      # a human/import statement upgrades an AI suggestion
+                        new["verification"] = verification
+                        self.db.exec("UPDATE edges SET origin=? WHERE id=?", (origin, exd["id"]))
                     return self.update_edge(exd["id"], new, actor=actor, log=log)
                 # reactivate (deleted by anyone or rejected-by-user then re-created by user)
                 self.db.exec("UPDATE edges SET status='active', verification=?, origin=?, confidence=?, explanation=?, evidence=?, updated_at=? WHERE id=?",

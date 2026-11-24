@@ -10,6 +10,8 @@ from .ingest.pipeline import IngestionEngine
 from .retrieval import RetrievalEngine
 from .maintenance import MaintenanceEngine
 from .evolution import Evolution
+from .vault import VaultManager
+from .auth import KeyManager
 
 
 class Brain:
@@ -25,6 +27,8 @@ class Brain:
         self.retrieval = RetrievalEngine(self.db, self.store, self.graph, self.settings)
         self.maintenance = MaintenanceEngine(self.db, self.store, self.graph, self.settings, self.ingest.rel)
         self.evolution = Evolution(self.db, self.store, self.graph, self.settings)
+        self.vault = VaultManager(self.store, self.graph, self.ingest)
+        self.keys = KeyManager(self.db)
 
     def close(self):
         self.ingest.stop()
