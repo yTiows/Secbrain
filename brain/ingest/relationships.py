@@ -103,6 +103,16 @@ class RelationshipDiscoverer:
             if r:
                 scored.append(r)
         scored.sort(key=lambda r: -r["confidence"])
+        # directed cue-based relations point at the best-matching target(s) only (an object "depends on RabbitMQ" once, not on every note that mentions it)
+        per_type: dict[str, int] = defaultdict(int)
+        kept = []
+        for r in scored:
+            if r["type"] in ("depends_on", "implements", "supports", "explains"):
+                per_type[r["type"]] += 1
+                if per_type[r["type"]] > 2:
+                    continue
+            kept.append(r)
+        scored = kept
         out = []
         for r in scored[: self.s.rel_max_per_object]:
             e = self.graph.add_edge(r["src"], r["dst"], r["type"], origin="ai", confidence=r["confidence"],

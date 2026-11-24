@@ -29,22 +29,38 @@ def words(text: str) -> list[str]:
     return [m.group(0) for m in _WORD.finditer(text)]
 
 
+IRREGULAR = {"chose": "choose", "chosen": "choose", "built": "build", "ran": "run", "went": "go", "gone": "go", "made": "make",
+             "took": "take", "taken": "take", "wrote": "write", "written": "write", "saw": "see", "seen": "see", "did": "do",
+             "done": "do", "bought": "buy", "began": "begin", "begun": "begin", "kept": "keep", "left": "leave", "led": "lead",
+             "found": "find", "gave": "give", "given": "give", "held": "hold", "knew": "know", "known": "know", "met": "meet",
+             "sent": "send", "set": "set", "spent": "spend", "thought": "think", "told": "tell", "won": "win", "swapped": "swap"}
+
+
 def stem(w: str) -> str:
-    """Conservative suffix stripper; only needs to be consistent between index and query."""
+    """Light two-pass stemmer (plurals, then derivational suffixes). Only needs to be consistent between index and query."""
     w = w.lower()
+    w = IRREGULAR.get(w, w)
     if len(w) <= 3 or not w.isalpha():
         return w
-    for suf, rep in (("ies", "y"), ("sses", "ss"), ("ational", "ate"), ("ization", "ize"), ("izing", "ize"), ("ised", "ise")):
-        if w.endswith(suf) and len(w) - len(suf) >= 2:
-            return w[: -len(suf)] + rep
-    for suf in ("ingly", "edly", "ment", "ness", "ings", "ing", "ed", "ly", "es", "s"):
+    # pass 1: plurals
+    if w.endswith("ies") and len(w) > 4:
+        w = w[:-3] + "y"
+    elif w.endswith("sses"):
+        w = w[:-2]
+    elif w.endswith(("ches", "shes", "xes", "zes")) and len(w) > 5:
+        w = w[:-2]
+    elif w.endswith("s") and not w.endswith(("ss", "us", "is")) and len(w) > 3:
+        w = w[:-1]
+    # pass 2: derivational
+    for suf, rep in (("ational", "ate"), ("ization", "ize"), ("ingly", ""), ("edly", ""), ("ment", ""), ("ness", ""), ("ing", ""), ("ed", ""), ("ly", "")):
         if w.endswith(suf) and len(w) - len(suf) >= 3:
-            if suf == "s" and w.endswith("ss"):
-                return w
-            base = w[: -len(suf)]
+            base = w[: -len(suf)] + rep
             if len(base) > 3 and base[-1] == base[-2] and base[-1] not in "lsz":
                 base = base[:-1]
-            return base
+            w = base
+            break
+    if w.endswith("e") and len(w) > 4:
+        w = w[:-1]
     return w
 
 

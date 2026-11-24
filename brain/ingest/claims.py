@@ -66,6 +66,11 @@ def norm_value(v: str) -> str:
     return re.sub(r"[^\w+#.%/ ]", "", ART.sub("", v.lower())).strip()
 
 
+MONTHS = r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)"
+DATEVAL = r"(?:" + MONTHS + r"\s+\d{1,2}(?:,?\s+\d{4})?|\d{4}-\d{2}-\d{2})"
+NUMVAL = r"(?:" + DATEVAL + r"|\$?\d[\d,]*(?:\.\d+)?(?:\s*[A-Za-z%]+)?(?:\s+per\s+[a-z]+)?)"
+_OLD_NUMVAL = r"\$?\d[\d,]*(?:\.\d+)?(?:\s*[A-Za-z%]+)?(?:\s+per\s+[a-z]+)?"
+QUAL = r"(?:\s+(?:for|in|on|at|after|when|according|by|during|if|as|from|before|until|with|of|under|across)\b[^.;]*)?"
 PATTERNS: list[tuple[re.Pattern, str]] = []
 
 
@@ -81,15 +86,15 @@ _p(r"^(?:we\s+|the team\s+)?(?:have\s+)?(?:migrated|switched|moved)\s+from\s+(?P
 _p(r"^(?:we\s+)?(?:have\s+)?replaced\s+(?P<old>[^,.;]+?)\s+with\s+(?P<v>[^,.;]+?)(?:\s+(?:for|in|on)\s+(?P<s>[^,.;]+?))?\s*[.;]?$", "replaced")
 _p(r"^(?P<v>[^,.;]+?)\s+replaces\s+(?P<old>[^,.;]+?)\s*[.;]?$", "replaced")
 # attribute: "The default timeout is 30 seconds" / "X's timeout is 30 s" / "The timeout of X is 30 s"
-_p(r"^(?:the\s+)?(?P<attr>[\w\- ]{2,40}?)\s+(?:of|for)\s+(?P<s>[^,.;]+?)\s+(?:is|was|are|=)\s+(?:set to\s+|now\s+)?(?P<v>[^,;]+?)\s*[.;]?$", "attr_of")
-_p(r"^(?P<s>[A-Z][\w\.\-]*(?: [A-Z][\w\.\-]*){0,3})'s\s+(?P<attr>[\w\- ]{2,40}?)\s+(?:is|was|are)\s+(?:set to\s+|now\s+)?(?P<v>[^,;]+?)\s*[.;]?$", "attr_of")
-_p(r"^(?:the\s+)?(?P<s>[\w\- ]{3,50}?)\s+(?:is|are|was|will be)\s+(?:now\s+|set to\s+|currently\s+)?(?P<v>(?:\$?\d[\d,]*(?:\.\d+)?\s*[A-Za-z%/]*|[A-Z][\w\.\+#\-]*(?: [A-Z][\w\.\+#\-]*){0,2}))\s*[.;]?$", "is")
+_p(r"^(?:the\s+)?(?P<attr>[\w\- ]{2,40}?)\s+(?:of|for)\s+(?P<s>[^,.;]+?)\s+(?:is|was|are|=)\s+(?:set to\s+|now\s+)?(?:(?P<v>" + NUMVAL + r")" + QUAL + r"|(?P<v2>[^,;]+?))\s*[.;]?$", "attr_of")
+_p(r"^(?P<s>(?-i:[A-Z])[\w\.\-]*(?: (?-i:[A-Z])[\w\.\-]*){0,3})'s\s+(?P<attr>[\w\- ]{2,40}?)\s+(?:is|was|are)\s+(?:set to\s+|now\s+)?(?:(?P<v>" + NUMVAL + r")" + QUAL + r"|(?P<v2>[^,;]+?))\s*[.;]?$", "attr_of")
+_p(r"^(?:the\s+)?(?P<s>[\w\- ]{3,50}?)\s+(?:is|are|was|will be)\s+(?:now\s+|set to\s+|currently\s+)?(?:(?P<v>" + NUMVAL + r")" + QUAL + r"|(?P<v2>(?-i:[A-Z])[\w\.\+#\-]*(?: (?-i:[A-Z])[\w\.\+#\-]*){0,2}))\s*[.;]?$", "is")
 # runs on / hosted on / deployed on / written in
-_p(r"^(?:the\s+)?(?P<s>[\w\.\- ]{2,50}?)\s+(?P<neg>does not |doesn't |no longer )?(?P<p>runs on|is hosted on|is deployed (?:on|to)|is written in|stores (?:its |all )?[\w ]{2,20} in)\s+(?P<v>[^,.;]+?)\s*[.;]?$", "verb_func")
+_p(r"^(?:the\s+)?(?P<s>[\w\.\- ]{2,50}?)\s+(?P<neg>does not |doesn't |no longer )?(?P<p>runs on|is hosted on|is deployed (?:on|to)|is written in|stores (?:its |all )?[\w ]{2,20} in)\s+(?P<v>[^,.;]+?)(?:\s+(?:and|but|which|while|so|because)\b.*)?\s*[.;]?$", "verb_func")
 # numeric attribute verbs
 _p(r"^(?:the\s+)?(?P<s>[\w\.\- ]{2,50}?)\s+(?P<p>allows|limits|caps|handles|supports|has|have|retains|keeps)\s+(?:up to |a maximum of |a limit of |at most |a max of )?(?P<v>\$?\d[\d,]*(?:\.\d+)?\s*[A-Za-z%]+(?:\s+per\s+[a-z]+)?)\s*[.;]?$", "numeric")
 # uses / requires / supports (multi-valued; with polarity for contradiction vs negation)
-_p(r"^(?:the\s+)?(?P<s>[\w\.\-]+(?: [\w\.\-]+){0,3}?)\s+" + NEG + r"?\s*(?P<p>uses?|requires?|supports?|depends on|relies on)\s+(?P<v>[^,.;]+?)\s*[.;]?$", "verb_multi")
+_p(r"^(?:the\s+)?(?P<s>[\w\.\-]+(?: [\w\.\-]+){0,3}?)\s+" + NEG + r"?\s*(?P<p>uses?|requires?|supports?|depends on|relies on)\s+(?P<v>[^,.;]+?)(?:\s+(?:and|but|which|while|so|because)\b.*)?\s*[.;]?$", "verb_multi")
 
 
 def _mk(subject, predicate, value, text, functional, polarity=1, conf=0.6) -> ParsedClaim | None:
@@ -119,11 +124,11 @@ def parse_sentence(sent: str) -> list[ParsedClaim]:
             # subject = the NEW thing, value = the OLD thing it supersedes
             c = _mk(g["v"], "replaced", g["old"], s, False, 1, 0.75)
         elif kind == "attr_of":
-            c = _mk(g["s"], _clean_np(g["attr"]).lower(), g["v"], s, True, 1, 0.6)
+            c = _mk(g["s"], _clean_np(g["attr"]).lower(), g.get("v") or g["v2"], s, True, 1, 0.6)
         elif kind == "is":
             if re.match(r"(this|that|it|there|what|which)\b", g["s"].strip(), re.I):
                 continue
-            c = _mk(g["s"], "is", g["v"], s, True, 1, 0.5)
+            c = _mk(g["s"], "is", g.get("v") or g["v2"], s, True, 1, 0.5)
         elif kind == "verb_func":
             c = _mk(g["s"], re.sub(r"^stores .*? in$", "stores in", g["p"].lower()).replace("is ", ""), g["v"], s, True,
                     -1 if g.get("neg") else 1, 0.6)

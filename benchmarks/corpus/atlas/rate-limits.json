@@ -1,0 +1,10 @@
+{
+  "title": "Gateway rate limit configuration",
+  "project": "Atlas",
+  "owner": "platform team",
+  "limits": {
+    "public_api": "100 requests per minute",
+    "partner_api": "1000 requests per minute"
+  },
+  "notes": "The API gateway enforces these limits per client key and returns HTTP 429 when exceeded."
+}

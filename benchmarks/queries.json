@@ -1,0 +1,452 @@
+[
+ {
+  "id": "direct-db",
+  "cat": "direct",
+  "q": "Why did we choose PostgreSQL for Atlas?",
+  "rel": [
+   "atlas/db-decision.md"
+  ],
+  "ok": [
+   "atlas/architecture.md"
+  ]
+ },
+ {
+  "id": "direct-deploy",
+  "cat": "direct",
+  "q": "How do I deploy Atlas to production?",
+  "rel": [
+   "atlas/runbook-deploy.md"
+  ]
+ },
+ {
+  "id": "direct-pref",
+  "cat": "direct",
+  "q": "What editor settings do I prefer?",
+  "rel": [
+   "personal/preferences.md"
+  ]
+ },
+ {
+  "id": "direct-rate",
+  "cat": "direct",
+  "q": "What is the rate limit for the public API?",
+  "rel": [
+   "atlas/rate-limits.json"
+  ]
+ },
+ {
+  "id": "direct-pasta",
+  "cat": "direct",
+  "q": "How do I cook pasta?",
+  "rel": [
+   "personal/cooking-pasta.txt"
+  ]
+ },
+ {
+  "id": "direct-broker",
+  "cat": "direct",
+  "q": "Which message broker did we pick and why not Kafka?",
+  "rel": [
+   "atlas/architecture.md"
+  ],
+  "ok": [
+   "atlas/kafka-evaluation.md"
+  ]
+ },
+ {
+  "id": "direct-latency",
+  "cat": "direct",
+  "q": "What is the p95 latency of the API gateway?",
+  "rel": [
+   "atlas/perf-report.pdf"
+  ]
+ },
+ {
+  "id": "direct-keys",
+  "cat": "direct",
+  "q": "How often are signing keys rotated?",
+  "rel": [
+   "atlas/auth-service.md"
+  ]
+ },
+ {
+  "id": "direct-rollback",
+  "cat": "direct",
+  "q": "How do we roll back a bad release?",
+  "rel": [
+   "atlas/runbook-deploy.md"
+  ]
+ },
+ {
+  "id": "direct-lessons",
+  "cat": "direct",
+  "q": "What lessons did we learn about eviction?",
+  "rel": [
+   "atlas/postmortem-2025-03.md"
+  ]
+ },
+ {
+  "id": "syn-postgres",
+  "cat": "synonym",
+  "q": "What is the Postgres connection pooling strategy?",
+  "rel": [
+   "atlas/db-decision.md"
+  ],
+  "ok": [
+   "atlas/perf-report.pdf"
+  ]
+ },
+ {
+  "id": "syn-jwt",
+  "cat": "synonym",
+  "q": "How long do JSON Web Tokens last before they need to be renewed?",
+  "rel": [
+   "atlas/auth-service.md"
+  ],
+  "ok": [
+   "atlas/security-review.md"
+  ]
+ },
+ {
+  "id": "syn-rag",
+  "cat": "synonym",
+  "q": "What does RAG stand for and how does chunking affect it?",
+  "rel": [
+   "orion/rag-research.md"
+  ]
+ },
+ {
+  "id": "syn-ledger",
+  "cat": "synonym",
+  "q": "Which database technology holds the payment ledger?",
+  "rel": [
+   "atlas/architecture.md",
+   "atlas/payments-design.docx"
+  ],
+  "ok": [
+   "atlas/db-decision.md"
+  ]
+ },
+ {
+  "id": "multi-retry",
+  "cat": "multihop",
+  "q": "What infrastructure does the payment retry logic rely on?",
+  "rel": [
+   "atlas/payments-design.docx",
+   "atlas/architecture.md"
+  ]
+ },
+ {
+  "id": "multi-session",
+  "cat": "multihop",
+  "q": "What replaced the Redis session store after the logout incident?",
+  "rel": [
+   "atlas/session-store-update.md",
+   "atlas/postmortem-2025-03.md"
+  ]
+ },
+ {
+  "id": "multi-aftermath",
+  "cat": "multihop",
+  "q": "What happened to sessions after the March incident and what are the current settings?",
+  "rel": [
+   "atlas/postmortem-2025-03.md",
+   "atlas/session-store-update.md"
+  ]
+ },
+ {
+  "id": "cross-pg",
+  "cat": "multihop",
+  "q": "Which projects depend on PostgreSQL?",
+  "rel": [
+   "atlas/db-decision.md",
+   "orion/vector-db-decision.md"
+  ],
+  "ok": [
+   "atlas/architecture.md",
+   "atlas/payments-design.docx"
+  ]
+ },
+ {
+  "id": "res-hybrid",
+  "cat": "research",
+  "q": "What did the experiments show about hybrid retrieval precision?",
+  "rel": [
+   "orion/experiment-log.md"
+  ],
+  "ok": [
+   "orion/rag-research.md",
+   "orion/hypothesis-reranking.md"
+  ]
+ },
+ {
+  "id": "res-rerank",
+  "cat": "research",
+  "q": "Do we think a reranker would improve precision?",
+  "rel": [
+   "orion/hypothesis-reranking.md"
+  ],
+  "ok": [
+   "orion/experiment-log.md",
+   "orion/rag-research.md"
+  ]
+ },
+ {
+  "id": "res-hybrid-rerank",
+  "cat": "research",
+  "q": "How do hybrid search and reranking work together?",
+  "rel": [
+   "orion/rag-research.md",
+   "orion/hypothesis-reranking.md"
+  ],
+  "ok": [
+   "orion/experiment-log.md"
+  ]
+ },
+ {
+  "id": "conf-timeout",
+  "cat": "contradiction",
+  "q": "What is the default timeout in Atlas?",
+  "rel": [
+   "atlas/db-decision.md",
+   "atlas/session-store-update.md"
+  ],
+  "expect_conflict": true
+ },
+ {
+  "id": "conf-token",
+  "cat": "contradiction",
+  "q": "What is the access token lifetime?",
+  "rel": [
+   "atlas/auth-service.md",
+   "atlas/security-review.md"
+  ],
+  "expect_conflict": true
+ },
+ {
+  "id": "temporal-session",
+  "cat": "temporal",
+  "q": "What is the current session store for Atlas?",
+  "rel": [
+   "atlas/session-store-update.md"
+  ],
+  "ok": [
+   "atlas/postmortem-2025-03.md",
+   "atlas/auth-service.md"
+  ],
+  "top1": "atlas/session-store-update.md"
+ },
+ {
+  "id": "amb-python",
+  "cat": "ambiguous",
+  "q": "Python",
+  "rel": [
+   "orion/python-env.md",
+   "orion/overview.md",
+   "personal/python-snake-trivia.md"
+  ]
+ },
+ {
+  "id": "sim-snake",
+  "cat": "irrelevant_similar",
+  "q": "How long do pythons grow and where do they live?",
+  "rel": [
+   "personal/python-snake-trivia.md"
+  ],
+  "distract": [
+   "orion/python-env.md",
+   "orion/overview.md"
+  ]
+ },
+ {
+  "id": "sim-venv",
+  "cat": "irrelevant_similar",
+  "q": "Python virtual environment rules for experiments",
+  "rel": [
+   "orion/python-env.md"
+  ],
+  "distract": [
+   "personal/python-snake-trivia.md"
+  ]
+ },
+ {
+  "id": "neg-physics",
+  "cat": "negative",
+  "q": "quantum chromodynamics lattice gauge theory",
+  "rel": [],
+  "expect_empty": true
+ },
+ {
+  "id": "neg-policy",
+  "cat": "negative",
+  "q": "What is the corporate travel reimbursement policy?",
+  "rel": [],
+  "expect_empty": true
+ },
+ {
+  "id": "hard-relational",
+  "cat": "paraphrase",
+  "q": "Which relational datastore did the team settle on for the marketplace platform?",
+  "rel": [
+   "atlas/db-decision.md"
+  ],
+  "ok": [
+   "atlas/architecture.md"
+  ]
+ },
+ {
+  "id": "hard-signedin",
+  "cat": "paraphrase",
+  "q": "How long can a user stay signed in without logging in again?",
+  "rel": [
+   "atlas/auth-service.md"
+  ],
+  "ok": [
+   "atlas/security-review.md"
+  ]
+ },
+ {
+  "id": "hard-failover",
+  "cat": "paraphrase",
+  "q": "What do we do if the primary database node dies?",
+  "rel": [
+   "atlas/oncall-guide.md"
+  ],
+  "ok": [
+   "atlas/db-decision.md"
+  ]
+ },
+ {
+  "id": "hard-vectors",
+  "cat": "paraphrase",
+  "q": "How are we storing the vectors for the recommender?",
+  "rel": [
+   "orion/vector-db-decision.md"
+  ]
+ },
+ {
+  "id": "hard-owner",
+  "cat": "paraphrase",
+  "q": "Who is responsible for the gateway limits?",
+  "rel": [
+   "atlas/rate-limits.json"
+  ]
+ },
+ {
+  "id": "temporal-due",
+  "cat": "temporal",
+  "q": "When is the Orion prototype due?",
+  "rel": [
+   "orion/meeting-2025-08.md",
+   "orion/overview.md"
+  ],
+  "expect_conflict": true,
+  "top1": "orion/meeting-2025-08.md"
+ },
+ {
+  "id": "dist-queue",
+  "cat": "irrelevant_similar",
+  "q": "Which message queue handles events between the order and payments services?",
+  "rel": [
+   "atlas/architecture.md"
+  ],
+  "ok": [
+   "atlas/kafka-evaluation.md"
+  ]
+ },
+ {
+  "id": "dist-metrics",
+  "cat": "direct",
+  "q": "Explain precision and recall for retrieval",
+  "rel": [
+   "orion/eval-metrics.md"
+  ],
+  "ok": [
+   "orion/experiment-log.md",
+   "personal/ml-course-notes.md"
+  ]
+ },
+ {
+  "id": "dist-router",
+  "cat": "irrelevant_similar",
+  "q": "How do I set up my home router?",
+  "rel": [
+   "personal/home-network.md"
+  ],
+  "distract": [
+   "atlas/onboarding.md",
+   "atlas/runbook-deploy.md"
+  ]
+ },
+ {
+  "id": "dist-snake",
+  "cat": "irrelevant_similar",
+  "q": "What temperature does a snake need?",
+  "rel": [
+   "personal/python-snake-care.md"
+  ],
+  "ok": [
+   "personal/python-snake-trivia.md"
+  ],
+  "distract": [
+   "orion/python-env.md"
+  ]
+ },
+ {
+  "id": "proj-decisions",
+  "cat": "multihop",
+  "q": "What are the key decisions in the Orion project?",
+  "rel": [
+   "orion/vector-db-decision.md"
+  ],
+  "ok": [
+   "orion/overview.md"
+  ]
+ },
+ {
+  "id": "pref-keys",
+  "cat": "paraphrase",
+  "q": "Which keybindings do I like?",
+  "rel": [
+   "personal/preferences.md"
+  ]
+ },
+ {
+  "id": "lesson-fix",
+  "cat": "multihop",
+  "q": "What went wrong with sessions and what should we change?",
+  "rel": [
+   "atlas/postmortem-2025-03.md"
+  ],
+  "ok": [
+   "atlas/session-store-update.md"
+  ]
+ },
+ {
+  "id": "ent-stripe",
+  "cat": "direct",
+  "q": "Tell me about Stripe",
+  "rel": [
+   "atlas/vendor-stripe.md",
+   "atlas/payments-design.docx"
+  ]
+ },
+ {
+  "id": "neg-passport",
+  "cat": "negative",
+  "q": "How do I renew my passport?",
+  "rel": [],
+  "expect_empty": true
+ },
+ {
+  "id": "idem",
+  "cat": "direct",
+  "q": "What header must be sent when creating charges?",
+  "rel": [
+   "atlas/api-conventions.md"
+  ],
+  "ok": [
+   "atlas/payments-design.docx"
+  ]
+ }
+]

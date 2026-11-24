@@ -288,8 +288,6 @@ class IngestionEngine:
         if not sections:
             raise ValidationError("no content could be structured from the source")
         project = opts.get("project") or (front.get("project") if isinstance(front.get("project"), str) else None)
-        if not project and "/" in uri.replace("\\", "/") and not uri.startswith("note:"):
-            project = uri.replace("\\", "/").split("/")[0]
         user_tags = list(opts.get("tags") or []) + (front.get("tags") if isinstance(front.get("tags"), list) else
                                                     [front["tags"]] if isinstance(front.get("tags"), str) else [])
         forced_type = opts.get("type") or (front.get("type") if front.get("type") in OBJECT_TYPES else None)
@@ -399,7 +397,7 @@ class IngestionEngine:
             report["objects"].append({"id": u.oid, "title": u.title, "type": u.type, "decision": decision, "classification_confidence": u.type_conf,
                                       "origin_key": u.origin_key, "duplicate_of": existing["id"] if decision == "evidence" else None})
             # claims for new/updated objects
-            if decision in ("new", "update"):
+            if decision in ("new", "update") and not u.is_doc:
                 report["claims"] += self._persist_claims(u, src)
 
         # ---- structure edges: section → document, object → project
