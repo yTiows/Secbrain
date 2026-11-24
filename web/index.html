@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Secbrain</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='4' fill='%235ec8e5'/%3E%3Ccircle cx='6' cy='8' r='2.5' fill='%23a58cf0'/%3E%3Ccircle cx='26' cy='9' r='2.5' fill='%23e5b45e'/%3E%3Ccircle cx='24' cy='25' r='2.5' fill='%236fd49a'/%3E%3Cpath d='M16 16 6 8M16 16l10-7M16 16l8 9' stroke='%235ec8e5' stroke-width='1.2' opacity='.6'/%3E%3C/svg%3E">
+</head>
+<body>
+<div id="login" class="login" hidden>
+  <form id="loginForm" class="login-card">
+    <h1>Secbrain</h1>
+    <p class="muted">Enter an API key. The bootstrap admin key is stored in <code>data/admin.key</code> on the server.</p>
+    <input id="tokenInput" type="password" autocomplete="off" placeholder="brk_…" aria-label="API key" required>
+    <button class="btn primary" type="submit">Unlock</button>
+    <p id="loginErr" class="err" role="alert"></p>
+  </form>
+</div>
+
+<div id="app" class="app" hidden>
+  <nav class="rail" aria-label="Main">
+    <div class="brand" title="Secbrain">◉</div>
+    <button data-view="graph" class="nav active" title="Knowledge graph"><span class="ico">⬡</span><span class="lbl">Graph</span></button>
+    <button data-view="explore" class="nav" title="Explorer"><span class="ico">☰</span><span class="lbl">Explore</span></button>
+    <button data-view="search" class="nav" title="Search"><span class="ico">⌕</span><span class="lbl">Search</span></button>
+    <button data-view="intel" class="nav" title="Intelligence center"><span class="ico">✦</span><span class="lbl">Intel<b id="intelBadge" class="badge" hidden></b></span></button>
+    <button data-view="vault" class="nav" title="Vault management"><span class="ico">▤</span><span class="lbl">Vault</span></button>
+    <div class="spacer"></div>
+    <button id="logout" class="nav" title="Lock"><span class="ico">⏻</span><span class="lbl">Lock</span></button>
+  </nav>
+
+  <main class="main">
+    <section id="view-graph" class="view active">
+      <div class="toolbar">
+        <input id="gSearch" type="search" placeholder="Find node in graph…" aria-label="Find node">
+        <details id="gFilters" class="filters"><summary class="btn small">Filters</summary>
+          <div id="gTypes" class="chips" aria-label="Filter by type"></div>
+          <label class="inline">relationship strength ≥ <input id="gStrength" type="range" min="0" max="0.9" step="0.05" value="0"><span id="gStrengthVal">0</span></label>
+          <label class="inline">nodes <select id="gMax"><option>100</option><option selected>300</option><option>800</option><option>1500</option></select></label>
+          <button id="gReload" class="btn small">Reload</button>
+        </details>
+      </div>
+      <div class="canvas-wrap"><canvas id="graph" aria-label="Knowledge graph" tabindex="0"></canvas>
+        <div id="gInfo" class="gInfo"></div>
+        <div id="gLegend" class="legend"></div>
+        <div class="zoomctl"><button id="zIn" class="btn small" aria-label="Zoom in">+</button><button id="zOut" class="btn small" aria-label="Zoom out">−</button><button id="zFit" class="btn small" aria-label="Fit">⤢</button></div>
+      </div>
+    </section>
+
+    <section id="view-explore" class="view">
+      <div class="toolbar">
+        <input id="eQ" type="search" placeholder="Filter by title/content…" aria-label="Filter">
+        <select id="eType" aria-label="Type"><option value="">all types</option></select>
+        <select id="eStatus" aria-label="Status"><option value="active">active</option><option value="archived">archived</option><option value="superseded">superseded</option><option value="deleted">deleted</option></select>
+        <select id="eProject" aria-label="Project"><option value="">all projects</option></select>
+        <select id="eSort" aria-label="Sort"><option value="updated_at DESC">recently updated</option><option value="created_at DESC">recently created</option><option value="importance DESC">importance</option><option value="title ASC">title</option></select>
+      </div>
+      <div id="eList" class="list"></div>
+    </section>
+
+    <section id="view-search" class="view">
+      <form id="sForm" class="toolbar">
+        <input id="sQ" type="search" placeholder="Ask or search your knowledge…" aria-label="Query" required>
+        <label class="inline"><input type="radio" name="smode" value="search" checked> results</label>
+        <label class="inline"><input type="radio" name="smode" value="context"> AI context package</label>
+        <label class="inline">budget <input id="sBudget" type="number" value="1500" min="200" max="32000" step="100"></label>
+        <button class="btn primary" type="submit">Search</button>
+      </form>
+      <div id="sOut" class="list"></div>
+    </section>
+
+    <section id="view-intel" class="view">
+      <div class="toolbar"><button id="runMaint" class="btn primary">Run maintenance now</button><span id="maintStatus" class="muted"></span></div>
+      <div id="intelOut" class="intel"></div>
+    </section>
+
+    <section id="view-vault" class="view">
+      <div id="vaultOut" class="vault"></div>
+    </section>
+  </main>
+
+  <aside id="detail" class="detail" hidden aria-label="Knowledge detail">
+    <div class="detail-head"><strong id="dTitle"></strong><button id="dClose" class="btn small" aria-label="Close">✕</button></div>
+    <div id="dBody" class="detail-body"></div>
+  </aside>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="graph.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -2,7 +2,7 @@
  "corpus": {
   "files": 40,
   "failures": [],
-  "ingest_seconds": 0.64
+  "ingest_seconds": 0.7
  },
  "graph": {
   "nodes": 106,
@@ -57,9 +57,9 @@
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "0 distractors in 4 queries",
    "latency_ms": {
-    "p50": 1.51,
-    "p95": 2.56,
-    "max": 4.35
+    "p50": 1.81,
+    "p95": 3.07,
+    "max": 5.38
    },
    "by_category": {
     "ambiguous": {
@@ -412,8 +412,8 @@
      "cat": "research",
      "docs": [
       "orion/experiment-log.md",
-      "personal/ml-course-notes.md",
       "orion/overview.md",
+      "personal/ml-course-notes.md",
       "orion/hypothesis-reranking.md",
       "orion/eval-metrics.md"
      ],
@@ -820,9 +820,9 @@
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "0 distractors in 4 queries",
    "latency_ms": {
-    "p50": 1.58,
-    "p95": 2.49,
-    "max": 2.88
+    "p50": 1.96,
+    "p95": 3.25,
+    "max": 3.79
    },
    "by_category": {
     "ambiguous": {
@@ -1398,7 +1398,7 @@
      "docs": [
       "atlas/rate-limits.json"
      ],
-     "n_items": 3,
+     "n_items": 4,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -1583,8 +1583,8 @@
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "1 distractors in 4 queries",
    "latency_ms": {
-    "p50": 1.89,
-    "p95": 3.08,
+    "p50": 2.36,
+    "p95": 3.62,
     "max": 4.2
    },
    "by_category": {
@@ -1811,7 +1811,7 @@
       "atlas/postmortem-2025-03.md",
       "personal/ml-course-notes.md"
      ],
-     "n_items": 2,
+     "n_items": 3,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -1826,8 +1826,8 @@
      "docs": [
       "atlas/db-decision.md",
       "atlas/perf-report.pdf",
-      "personal/reading-list.md",
       "personal/books-notes.md",
+      "personal/reading-list.md",
       "atlas/capacity-plan.md"
      ],
      "n_items": 8,
@@ -2013,10 +2013,10 @@
      "cat": "contradiction",
      "docs": [
       "atlas/session-store-update.md",
-      "atlas/db-decision.md",
-      "atlas/architecture.md"
+      "atlas/architecture.md",
+      "atlas/db-decision.md"
      ],
-     "n_items": 4,
+     "n_items": 5,
      "p3": 0.6666666666666666,
      "r3": 1.0,
      "r5": 1.0,
@@ -2151,7 +2151,7 @@
       "atlas/auth-service.md",
       "atlas/postmortem-2025-03.md"
      ],
-     "n_items": 3,
+     "n_items": 2,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2302,7 +2302,7 @@
       "orion/overview.md",
       "orion/vector-db-decision.md"
      ],
-     "n_items": 5,
+     "n_items": 4,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2387,15 +2387,15 @@
    "P@3": 0.381,
    "R@3": 0.909,
    "R@5": 0.94,
-   "MRR": 0.893,
-   "Hit@1": 0.833,
-   "precision_of_returned_top5": 0.642,
+   "MRR": 0.873,
+   "Hit@1": 0.81,
+   "precision_of_returned_top5": 0.634,
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "1 distractors in 4 queries",
    "latency_ms": {
-    "p50": 2.67,
-    "p95": 5.18,
-    "max": 7.91
+    "p50": 2.63,
+    "p95": 4.54,
+    "max": 5.04
    },
    "by_category": {
     "ambiguous": {
@@ -2408,23 +2408,23 @@
     "contradiction": {
      "n": 2,
      "r5": 1.0,
-     "mrr": 1.0,
-     "hit1": 1.0,
+     "mrr": 0.667,
+     "hit1": 0.5,
      "p_returned5": 0.7
     },
     "direct": {
      "n": 13,
      "r5": 1.0,
-     "mrr": 0.885,
+     "mrr": 0.872,
      "hit1": 0.769,
-     "p_returned5": 0.646
+     "p_returned5": 0.662
     },
     "irrelevant_similar": {
      "n": 5,
      "r5": 1.0,
      "mrr": 1.0,
      "hit1": 1.0,
-     "p_returned5": 0.523
+     "p_returned5": 0.457
     },
     "multihop": {
      "n": 6,
@@ -2459,7 +2459,7 @@
      "r5": 1.0,
      "mrr": 1.0,
      "hit1": 1.0,
-     "p_returned5": 0.5
+     "p_returned5": 0.4
     }
    },
    "rows": [
@@ -2492,9 +2492,9 @@
       "atlas/architecture.md",
       "atlas/vendor-stripe.md",
       "atlas/api-conventions.md",
-      "atlas/payments-design.docx"
+      "atlas/kafka-evaluation.md"
      ],
-     "n_items": 10,
+     "n_items": 9,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2509,17 +2509,16 @@
      "docs": [
       "atlas/session-store-update.md",
       "personal/preferences.md",
-      "personal/home-network.md",
       "orion/dataset-notes.md",
       "atlas/db-decision.md"
      ],
-     "n_items": 6,
+     "n_items": 5,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
      "mrr": 0.5,
      "hit1": 0.0,
-     "p_returned5": 0.2,
+     "p_returned5": 0.25,
      "leak3": null
     },
     {
@@ -2595,7 +2594,7 @@
      "docs": [
       "atlas/auth-service.md"
      ],
-     "n_items": 3,
+     "n_items": 2,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2611,7 +2610,7 @@
       "atlas/runbook-deploy.md",
       "atlas/frontend-notes.md"
      ],
-     "n_items": 4,
+     "n_items": 3,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2663,7 +2662,7 @@
       "atlas/api-conventions.md",
       "atlas/security-review.md"
      ],
-     "n_items": 6,
+     "n_items": 5,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2695,7 +2694,7 @@
       "atlas/architecture.md",
       "atlas/db-decision.md"
      ],
-     "n_items": 8,
+     "n_items": 5,
      "p3": 0.6666666666666666,
      "r3": 1.0,
      "r5": 1.0,
@@ -2710,7 +2709,7 @@
      "docs": [
       "atlas/payments-design.docx"
      ],
-     "n_items": 3,
+     "n_items": 2,
      "p3": 0.3333333333333333,
      "r3": 0.5,
      "r5": 0.5,
@@ -2796,7 +2795,7 @@
       "orion/rag-research.md",
       "orion/experiment-log.md"
      ],
-     "n_items": 5,
+     "n_items": 4,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2813,7 +2812,7 @@
       "orion/experiment-log.md",
       "orion/hypothesis-reranking.md"
      ],
-     "n_items": 5,
+     "n_items": 4,
      "p3": 0.6666666666666666,
      "r3": 1.0,
      "r5": 1.0,
@@ -2826,19 +2825,19 @@
      "id": "conf-timeout",
      "cat": "contradiction",
      "docs": [
-      "atlas/session-store-update.md",
-      "atlas/perf-report.pdf",
       "atlas/architecture.md",
+      "atlas/perf-report.pdf",
+      "atlas/session-store-update.md",
       "atlas/db-decision.md",
       "atlas/vendor-stripe.md",
-      "atlas/payments-design.docx"
+      "atlas/capacity-plan.md"
      ],
      "n_items": 10,
      "p3": 0.3333333333333333,
      "r3": 0.5,
      "r5": 1.0,
-     "mrr": 1.0,
-     "hit1": 1.0,
+     "mrr": 0.3333333333333333,
+     "hit1": 0.0,
      "p_returned5": 0.4,
      "leak3": null
     },
@@ -2849,7 +2848,7 @@
       "atlas/auth-service.md",
       "atlas/security-review.md"
      ],
-     "n_items": 6,
+     "n_items": 5,
      "p3": 0.6666666666666666,
      "r3": 1.0,
      "r5": 1.0,
@@ -2866,8 +2865,8 @@
       "atlas/perf-report.pdf",
       "atlas/payments-design.docx",
       "atlas/auth-service.md",
-      "atlas/postmortem-2025-03.md",
-      "atlas/vendor-stripe.md"
+      "atlas/vendor-stripe.md",
+      "atlas/capacity-plan.md"
      ],
      "n_items": 10,
      "p3": 0.3333333333333333,
@@ -2875,7 +2874,7 @@
      "r5": 1.0,
      "mrr": 1.0,
      "hit1": 1.0,
-     "p_returned5": 0.6,
+     "p_returned5": 0.4,
      "leak3": null,
      "top1_ok": true
     },
@@ -2884,8 +2883,8 @@
      "cat": "ambiguous",
      "docs": [
       "personal/python-snake-trivia.md",
-      "orion/python-env.md",
       "personal/python-snake-care.md",
+      "orion/python-env.md",
       "orion/overview.md",
       "personal/home-network.md"
      ],
@@ -2903,8 +2902,8 @@
      "cat": "irrelevant_similar",
      "docs": [
       "personal/python-snake-trivia.md",
-      "personal/running.md",
       "personal/python-snake-care.md",
+      "personal/running.md",
       "personal/home-network.md"
      ],
      "n_items": 4,
@@ -2972,7 +2971,7 @@
       "atlas/postmortem-2025-03.md",
       "atlas/auth-service.md"
      ],
-     "n_items": 6,
+     "n_items": 4,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -3006,7 +3005,7 @@
       "atlas/security-review.md",
       "atlas/session-store-update.md"
      ],
-     "n_items": 7,
+     "n_items": 6,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -3038,9 +3037,9 @@
       "orion/overview.md",
       "orion/vector-db-decision.md",
       "orion/meeting-2025-08.md",
-      "orion/python-env.md",
       "orion/hypothesis-reranking.md",
-      "orion/dataset-notes.md"
+      "orion/dataset-notes.md",
+      "orion/eval-metrics.md"
      ],
      "n_items": 10,
      "p3": 0.6666666666666666,
@@ -3058,16 +3057,15 @@
      "docs": [
       "atlas/architecture.md",
       "atlas/capacity-plan.md",
-      "atlas/payments-design.docx",
       "atlas/kafka-evaluation.md"
      ],
-     "n_items": 8,
+     "n_items": 7,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
      "mrr": 1.0,
      "hit1": 1.0,
-     "p_returned5": 0.5,
+     "p_returned5": 0.6666666666666666,
      "leak3": null
     },
     {
@@ -3075,33 +3073,33 @@
      "cat": "direct",
      "docs": [
       "orion/experiment-log.md",
-      "orion/eval-metrics.md",
       "personal/ml-course-notes.md",
-      "orion/overview.md",
-      "orion/hypothesis-reranking.md"
+      "orion/eval-metrics.md",
+      "orion/overview.md"
      ],
-     "n_items": 8,
+     "n_items": 6,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
-     "mrr": 0.5,
+     "mrr": 0.3333333333333333,
      "hit1": 0.0,
-     "p_returned5": 0.6,
+     "p_returned5": 0.75,
      "leak3": null
     },
     {
      "id": "dist-router",
      "cat": "irrelevant_similar",
      "docs": [
-      "personal/home-network.md"
+      "personal/home-network.md",
+      "atlas/session-store-update.md"
      ],
-     "n_items": 1,
+     "n_items": 2,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
      "mrr": 1.0,
      "hit1": 1.0,
-     "p_returned5": 1.0,
+     "p_returned5": 0.5,
      "leak3": 0
     },
     {
@@ -3127,10 +3125,10 @@
      "docs": [
       "orion/overview.md",
       "orion/vector-db-decision.md",
+      "orion/hypothesis-reranking.md",
       "orion/meeting-2025-08.md",
       "orion/dataset-notes.md",
-      "orion/eval-metrics.md",
-      "orion/hypothesis-reranking.md"
+      "orion/eval-metrics.md"
      ],
      "n_items": 10,
      "p3": 0.3333333333333333,
@@ -3215,12 +3213,12 @@
  "package": {
   "budget": 1500,
   "queries": 42,
-  "mean_package_tokens_est": 661.8,
-  "mean_selected_full_content_tokens_est": 175.8,
-  "entire_vault_tokens_est": 5079,
+  "mean_package_tokens_est": 614.6,
+  "mean_selected_full_content_tokens_est": 174.9,
+  "entire_vault_tokens_est": 4915,
   "over_budget": 0,
-  "source_traceability": "154/154",
-  "items_with_explanation": "152/154",
+  "source_traceability": "151/151",
+  "items_with_explanation": "149/151",
   "conflicts_reported": "3/3"
  }
 }

@@ -56,6 +56,15 @@ def _strip_stop_prefix(phrase: str) -> str:
     return "".join(parts).strip(" -")
 
 
+def _sentence_around(text: str, a: int, b: int, maxlen: int = 220) -> str:
+    left = max(text.rfind(". ", 0, a), text.rfind("\n", 0, a), text.rfind("! ", 0, a), text.rfind("? ", 0, a))
+    left = left + 1 if left >= 0 else 0
+    rights = [i for i in (text.find(". ", b), text.find("\n", b), text.find("! ", b), text.find("? ", b)) if i >= 0]
+    right = min(rights) + 1 if rights else len(text)
+    s = text[left:right].strip().replace("\n", " ")
+    return s if len(s) <= maxlen else s[: maxlen - 1].rsplit(" ", 1)[0] + "…"
+
+
 def _sentence_starts(text: str) -> set[int]:
     starts = {0}
     for m in re.finditer(r"(?:[.!?]\s+|\n\s*(?:[-*>]\s+|\d+[.)]\s+)?)", text):
@@ -138,7 +147,7 @@ def extract_entities(text: str, hint_entities: list[str] | None = None) -> dict[
         if not at_start:
             c.mid_count += 1
         if len(c.contexts) < 2:
-            c.contexts.append(text[max(0, m.start() - 60): m.end() + 60].replace("\n", " "))
+            c.contexts.append(_sentence_around(text, m.start(), m.end()))
     # promote sentence-start-only singles that also appeared mid-sentence
     lower_words = set(re.findall(r"\b[a-z][a-z0-9]+\b", text))
     for k in [k for k in cands if k.startswith("~")]:

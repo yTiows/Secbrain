@@ -15,6 +15,10 @@ from .text import tokens, stem, truncate, key as name_key, STOPWORDS, words
 from .ingest.enrich import GENERIC_WORDS
 
 
+GENERIC_CONCEPT_WORDS = {"second", "minut", "hour", "day", "week", "month", "year", "decision", "section", "project", "object", "note", "item",
+                         "thing", "number", "level", "point", "result", "step", "team", "group", "list", "type", "data"}
+
+
 class Evolution:
     def __init__(self, db: Database, store: KnowledgeStore, graph: GraphEngine, settings: Settings):
         self.db, self.store, self.graph, self.s = db, store, graph, settings
@@ -50,7 +54,11 @@ class Evolution:
             if name_key(disp) in known:
                 continue
             bigram = " " in k
-            score = len(ids) * (1.6 if bigram else 1.0)
+            if not bigram:
+                continue                              # single common words are too noisy; multi-word recurring terms are meaningful
+            if any(w in GENERIC_CONCEPT_WORDS for w in k.split()):
+                continue
+            score = len(ids) * 1.6
             out.append({"term": disp, "key": k, "objects": sorted(ids), "sources": len(srcs[k]), "score": score})
         out.sort(key=lambda x: -x["score"])
         # prefer bigrams over their constituent unigrams
@@ -93,10 +101,11 @@ class Evolution:
         rows = self.db.all("SELECT e.dst ent, e.src obj FROM edges e JOIN objects o ON o.id=e.src JOIN objects d ON d.id=e.dst "
                            "WHERE e.type='references' AND e.status='active' AND e.verification!='rejected' AND o.status='active' AND d.status='active' "
                            "AND d.type IN ('entity','concept') AND o.type NOT IN ('document','entity','concept')")
+        proj = {r["id"]: r["project"] for r in self.db.all("SELECT id, project FROM objects WHERE status='active'")}
         by = defaultdict(set)
         for r in rows:
-            by[r["ent"]].add(r["obj"])
-        for ent, objs in by.items():
+            by[(r["ent"], proj.get(r["obj"]))].add(r["obj"])        # same entity AND same project: avoids merging unrelated senses ("Python" the snake)
+        for (ent, _project), objs in by.items():
             if len(objs) < min_fragments:
                 continue
             qm = ",".join("?" * len(objs))
@@ -106,12 +115,10 @@ class Evolution:
             if self.db.one("SELECT 1 FROM edges e JOIN objects o ON o.id=e.src WHERE e.dst=? AND e.type='derived_from' LIMIT 1", (ent,)):
                 continue
             eo = self.store.get_object(ent)
-            if self.db.one("SELECT 1 FROM objects WHERE origin_key=?", (f"consolidation::{ent}",)):
-                continue
             f = add_finding(self.db, kind="consolidation", level="conditional", severity="info", confidence=0.6,
                             title=f"Consolidate {len(objs)} fragments about “{eo['title']}”",
                             explanation=f"{len(objs)} objects from {nsrc} sources discuss “{eo['title']}” with no overview. A consolidated note would quote them; originals stay untouched.",
-                            targets=sorted(objs)[:15], payload={"entity": ent}, dedupe_key=f"consol:{ent}")
+                            targets=sorted(objs)[:15], payload={"entity": ent}, dedupe_key=f"consol:{ent}:{_project}")
             if f:
                 res.append(f)
         return res

@@ -218,7 +218,7 @@ class RetrievalEngine:
             """Entities/projects linked to a large part of the vault are weak relevance conductors."""
             deg = len(adj.get(nid, ()))
             f = max(0.08, min(0.9, 1.0 - deg / (0.15 * n_nodes + 3)))
-            return f * (0.55 if nodes[nid]["type"] in ("project", "document") else 1.0)
+            return f * (0.35 if nodes[nid]["type"] in ("project", "document") else 1.0)
 
         # --- graph expansion (bounded, relevance-aware)
         if expand and cands:
@@ -463,8 +463,6 @@ class RetrievalEngine:
             m["sources"] = [{"id": s_["source_id"], "name": s_["name"]} for s_ in i["sources"] if s_["role"] == "primary"][:1] + \
                            [{"id": s_["source_id"], "name": s_["name"]} for s_ in i["sources"] if s_["role"] != "primary"][:2]
             m["why"] = truncate("; ".join(w for w in i["why"] if not w.startswith("matches query terms") or len(i["why"]) == 1)[:300] or "; ".join(i["why"])[:300], 220)
-            if i["via"]:
-                m["via"] = f"{i['via']['edge_type']} ({i['via']['hops']} hop) from {truncate(titles.get(i['via']['seed'], i['via']['seed']), 40)}"
             if i["superseded_by"]:
                 m["superseded_by"] = i["superseded_by"]
             if i["untrusted"]:
