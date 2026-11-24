@@ -134,6 +134,8 @@ CREATE TABLE IF NOT EXISTS edges(
 );
 CREATE INDEX IF NOT EXISTS ix_edges_src ON edges(src);
 CREATE INDEX IF NOT EXISTS ix_edges_dst ON edges(dst);
+CREATE INDEX IF NOT EXISTS ix_edges_dst_type ON edges(dst, type, status);
+CREATE INDEX IF NOT EXISTS ix_edges_type_src ON edges(type, src);
 
 CREATE TABLE IF NOT EXISTS edge_history(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -265,6 +267,7 @@ class Database:
         self._wconn.execute("INSERT OR IGNORE INTO meta(key,value) VALUES('schema_version',?)", (str(SCHEMA_VERSION),))
         self._wconn.commit()
         self.generation = 0  # bumped on every committed write; caches key off it
+        self.rollbacks = 0   # bumped on every rollback: caches built from uncommitted state must be discarded
 
     def _connect(self) -> sqlite3.Connection:
         c = sqlite3.connect(self.path, check_same_thread=False, isolation_level=None, timeout=30)
@@ -298,6 +301,7 @@ class Database:
             try:
                 yield self._wconn
             except BaseException:
+                self.rollbacks += 1
                 if depth == 0:
                     self._wconn.execute("ROLLBACK")
                 else:

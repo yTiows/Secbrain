@@ -226,6 +226,7 @@ class RetrievalEngine:
             top = seeds[0][1]["direct"] if seeds else 0
             allow = (lambda n: scope.allows(n)) if scope.restricted else None
             explored = 0
+            graph_best: dict[str, tuple] = {}
             for sid, sc in seeds:
                 if sc["direct"] < 0.35 * top or sc["direct"] < 0.08 or sid not in nodes:
                     continue
@@ -234,7 +235,8 @@ class RetrievalEngine:
                 for h in range(1, hops + 1):
                     nxt = []
                     for cur in frontier:
-                        for e in adj.get(cur, ()):
+                        cap = 12 if nodes[cur]["type"] in ("entity", "concept", "project", "document") else 25      # strongest edges first
+                        for e in adj.get(cur, ())[:cap]:
                             other = e["dst"] if e["src"] == cur else e["src"]
                             if other == sid or other not in nodes:
                                 continue
@@ -259,18 +261,27 @@ class RetrievalEngine:
                     if nodes[oid]["type"] in ("entity", "concept", "project") and oid not in cands:
                         continue                                        # hubs pass relevance along but are not results themselves
                     contrib = sc["direct"] * ps
-                    c = cands.get(oid)
-                    if c is None:
-                        o = self.db.one("SELECT * FROM objects WHERE id=?", (oid,))
-                        if not o or o["status"] not in ("active", "superseded") or not scope.allows(o) or (types and o["type"] not in types):
-                            continue
-                        c = cands[oid] = {"o": self.store._obj(o, full=False), "direct": 0.0, "graph": 0.0, "lex": 0.0, "cov": 0.0, "sem": 0.0,
-                                          "ent": 0.0, "title": 0.0, "agree": False, "via": None, "reasons": []}
-                    if contrib > c["graph"]:
-                        c["graph"] = contrib
+                    if contrib > graph_best.get(oid, (0,))[0]:
                         pe = via[1]
-                        c["via"] = {"from": via[0] if h == 1 else sid, "seed": sid, "hops": h, "edge_type": pe["type"], "edge_id": pe["id"],
-                                    "explanation": pe["explanation"], "path_strength": round(ps, 3)}
+                        graph_best[oid] = (contrib, {"from": via[0] if h == 1 else sid, "seed": sid, "hops": h, "edge_type": pe["type"], "edge_id": pe["id"],
+                                                     "explanation": pe["explanation"], "path_strength": round(ps, 3)})
+            # keep the strongest graph-reached candidates only, fetch their rows in ONE query
+            top_graph = sorted(graph_best.items(), key=lambda kv: -kv[1][0])[:80]
+            missing = [oid for oid, _ in top_graph if oid not in cands]
+            fetched = {}
+            if missing:
+                qm = ",".join("?" * len(missing))
+                for r in self.db.all(f"SELECT * FROM objects WHERE id IN ({qm}) AND status IN ('active','superseded')", missing):
+                    if scope.allows(r) and not (types and r["type"] not in types):
+                        fetched[r["id"]] = self.store._obj(r, full=False)
+            for oid, (contrib, via) in top_graph:
+                c = cands.get(oid)
+                if c is None:
+                    if oid not in fetched:
+                        continue
+                    c = cands[oid] = {"o": fetched[oid], "direct": 0.0, "graph": 0.0, "lex": 0.0, "cov": 0.0, "sem": 0.0, "sem_gate": 0.0,
+                                      "ent": 0.0, "title": 0.0, "agree": False, "via": None, "reasons": []}
+                c["graph"], c["via"] = contrib, via
         # --- contextual adjustments + relevance gate
         fb = self._feedback_prior()
         proj = an["project"]

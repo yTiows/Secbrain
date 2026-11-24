@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import re
 import unicodedata
+from functools import lru_cache
 
 STOPWORDS = set("""
 a an the and or but if then else of to in on at by for with from as is are was were be been being it its this that these those
@@ -91,6 +92,7 @@ def estimate_tokens(text: str) -> int:
     return max(int(len(text) / 4 + 0.5), int(len(text.split()) * 1.33 + 0.5))
 
 
+@lru_cache(maxsize=300_000)
 def key(s: str) -> str:
     """Normalized identity key for names/aliases."""
     s = normalize_unicode(s).lower().strip()

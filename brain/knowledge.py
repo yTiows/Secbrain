@@ -42,9 +42,12 @@ class KnowledgeStore:
         if blob:
             self.embedder.load_stats(blob)
         self._mat_lock = threading.Lock()
-        self._mat_gen = -1
+        self._mat_rb = -1                       # rollback epoch the cache was built under
+        self._mat_n = 0                         # rows in use
         self._mat_ids: list[str] = []
-        self._mat: np.ndarray | None = None
+        self._mat_pos: dict[str, int] = {}
+        self._mat: np.ndarray | None = None     # capacity-doubled buffer; rows [0:_mat_n] valid
+        self._emb_dirty: set[str] = set()
 
     # ------------------------------------------------------------------ stats
     def _load_stats(self) -> bytes | None:
@@ -195,6 +198,7 @@ class KnowledgeStore:
     def _index(self, oid: str, *, observe: bool):
         """Refresh FTS + embedding for an object (derived data)."""
         o = self._obj(self.db.one("SELECT * FROM objects WHERE id=?", (oid,)))
+        self._mark_dirty(oid)
         self.db.exec("DELETE FROM fts WHERE object_id=?", (oid,))
         if o["status"] in ("active", "archived", "superseded"):
             self.db.exec("INSERT INTO fts(title,content,tags,aliases,object_id) VALUES(?,?,?,?,?)",
@@ -360,6 +364,7 @@ class KnowledgeStore:
                 self.db.exec(f"DELETE FROM {t} WHERE {col}=?", (oid,))
             self.db.exec("DELETE FROM edges WHERE src=? OR dst=?", (oid, oid))
             self.db.exec("DELETE FROM objects WHERE id=?", (oid,))
+            self._mark_dirty(oid)
             self.log_change("user", "object_purge", oid, f"purged '{o['title']}' (irreversible)", {"op": "none"})
 
     def versions(self, oid: str) -> list[dict]:
@@ -410,19 +415,46 @@ class KnowledgeStore:
         return out
 
     # --------------------------------------------------------------- embeddings
+    def _mark_dirty(self, oid: str):
+        self._emb_dirty.add(oid)
+
     def embedding_matrix(self) -> tuple[list[str], np.ndarray]:
-        """In-memory cache of all vectors for active objects, invalidated by DB generation."""
+        """In-memory vectors of all active/superseded objects. Updated incrementally from the set of objects whose
+        embedding or status changed; fully rebuilt after any rollback (the cache may have seen uncommitted state)."""
         with self._mat_lock:
-            gen = self.db.generation
-            if self._mat is None or self._mat_gen != gen:
+            dim = self.embedder.dim
+            if self._mat is None or self._mat_rb != self.db.rollbacks:
                 rows = self.db.all("SELECT e.object_id, e.vec FROM embeddings e JOIN objects o ON o.id=e.object_id WHERE o.status IN ('active','superseded')")
-                ids = [r["object_id"] for r in rows]
-                if rows:
-                    mat = np.vstack([np.frombuffer(r["vec"], dtype=np.float32) for r in rows])
-                else:
-                    mat = np.zeros((0, self.embedder.dim), dtype=np.float32)
-                self._mat, self._mat_ids, self._mat_gen = mat, ids, gen
-            return self._mat_ids, self._mat
+                n = len(rows)
+                cap = max(256, int(n * 1.5))
+                self._mat = np.zeros((cap, dim), dtype=np.float32)
+                for i, r in enumerate(rows):
+                    self._mat[i] = np.frombuffer(r["vec"], dtype=np.float32)
+                self._mat_ids = [r["object_id"] for r in rows]
+                self._mat_pos = {oid: i for i, oid in enumerate(self._mat_ids)}
+                self._mat_n, self._mat_rb = n, self.db.rollbacks
+                self._emb_dirty.clear()
+            elif self._emb_dirty:
+                dirty, self._emb_dirty = self._emb_dirty, set()
+                for oid in dirty:
+                    r = self.db.one("SELECT e.vec, o.status FROM embeddings e JOIN objects o ON o.id=e.object_id WHERE e.object_id=?", (oid,))
+                    keep = bool(r) and r["status"] in ("active", "superseded")
+                    pos = self._mat_pos.get(oid)
+                    if keep:
+                        v = np.frombuffer(r["vec"], dtype=np.float32)
+                        if pos is None:
+                            if self._mat_n >= self._mat.shape[0]:
+                                self._mat = np.vstack([self._mat, np.zeros_like(self._mat)])
+                            pos = self._mat_n
+                            self._mat_ids.append(oid); self._mat_pos[oid] = pos; self._mat_n += 1
+                        self._mat[pos] = v
+                    elif pos is not None:                       # swap-delete
+                        last = self._mat_n - 1
+                        if pos != last:
+                            lid = self._mat_ids[last]
+                            self._mat[pos] = self._mat[last]; self._mat_ids[pos] = lid; self._mat_pos[lid] = pos
+                        self._mat_ids.pop(); del self._mat_pos[oid]; self._mat_n -= 1
+            return self._mat_ids, self._mat[: self._mat_n]
 
     def embedding_of(self, oid: str) -> np.ndarray | None:
         r = self.db.one("SELECT vec FROM embeddings WHERE object_id=?", (oid,))
@@ -456,6 +488,7 @@ class KnowledgeStore:
                 texts[r["id"]] = self._embed_text(o["title"], o["content"], o["tags"] + o["aliases"])
                 self.embedder.observe(texts[r["id"]])
             self._save_stats()
+            self._mat = None
             for oid, text in texts.items():
                 o = self._obj(self.db.one("SELECT * FROM objects WHERE id=?", (oid,)))
                 self.db.exec("INSERT INTO fts(title,content,tags,aliases,object_id) VALUES(?,?,?,?,?)",

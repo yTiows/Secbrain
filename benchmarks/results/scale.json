@@ -1,0 +1,25 @@
+{
+ "docs": 1500,
+ "objects": 4534,
+ "edges": 26763,
+ "ingest_total_s": 58.9,
+ "ingest_docs_per_s": 25.5,
+ "ingest_ms_p50_p95_last100": [
+  60.0,
+  87.4
+ ],
+ "reindex_s": 1.61,
+ "search_ms": {
+  "n": 100,
+  "p50": 24.7,
+  "p95": 34.49
+ },
+ "context_ms": {
+  "p50": 28.46,
+  "p95": 40.84
+ },
+ "graph_overview_ms": 1188.1,
+ "clusters_ms": 0.0,
+ "maintenance_subset_s": 13.8,
+ "disk_mb": 116.7
+}

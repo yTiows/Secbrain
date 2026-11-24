@@ -31,6 +31,7 @@ class GraphEngine:
         self._gen = -1
         self._adj: dict[str, list[dict]] = {}
         self._nodes: dict[str, dict] = {}
+        self._cache: dict = {}
 
     # ------------------------------------------------------------------ edges
     def _row(self, r) -> dict:
@@ -209,7 +210,10 @@ class GraphEngine:
                     d = self._row(r)
                     adj[d["src"]].append(d)
                     adj[d["dst"]].append(d)
+            for lst in adj.values():
+                lst.sort(key=lambda e: -e["strength"])          # strongest first: traversals can cap per-node work
             self._nodes, self._adj, self._gen = nodes, adj, self.db.generation
+            self._cache = {}
 
     def graph_view(self):
         self._load()
@@ -288,7 +292,16 @@ class GraphEngine:
         return list(reversed(path))
 
     # ---------------------------------------------------------------- analytics
+    def _cached(self, name, fn):
+        self._load()
+        if name not in self._cache:
+            self._cache[name] = fn()
+        return self._cache[name]
+
     def components(self) -> list[list[str]]:
+        return self._cached("components", self._components)
+
+    def _components(self) -> list[list[str]]:
         nodes, adj = self.graph_view()
         parent = {n: n for n in nodes}
 
@@ -309,9 +322,12 @@ class GraphEngine:
 
     def isolated(self) -> list[str]:
         nodes, adj = self.graph_view()
-        return [n for n in nodes if not adj.get(n)]
+        return self._cached("isolated", lambda: [n for n in nodes if not adj.get(n)])
 
     def clusters(self, iterations: int = 12) -> dict[str, int]:
+        return self._cached(f"clusters{iterations}", lambda: self._clusters(iterations))
+
+    def _clusters(self, iterations: int = 12) -> dict[str, int]:
         """Deterministic weighted label propagation. Returns node -> cluster id (0 = largest)."""
         nodes, adj = self.graph_view()
         label = {n: n for n in sorted(nodes)}
@@ -344,6 +360,9 @@ class GraphEngine:
         return out
 
     def centrality(self, damping: float = 0.85, iters: int = 30) -> dict[str, float]:
+        return self._cached(f"pr{damping}{iters}", lambda: self._centrality(damping, iters))
+
+    def _centrality(self, damping: float = 0.85, iters: int = 30) -> dict[str, float]:
         """Weighted PageRank over the undirected graph. Used to identify important nodes."""
         nodes, adj = self.graph_view()
         n = len(nodes)

@@ -216,10 +216,15 @@ class RelationshipDiscoverer:
                 continue
             if not c["subj_key"] or not c["pred_key"]:
                 continue
+            # context rule: facts only conflict inside the same project (or both unscoped); "default timeout" in two different
+            # projects is not a contradiction. Subjects that name a specific entity (capitalized) may conflict across projects.
+            cross_ok = bool(re.search(r"[A-Z]", c["subject"] or ""))
             rows = self.db.all(
                 "SELECT c.*, o.title otitle, o.status ostatus, o.created_at ocreated, o.event_time oevent FROM claims c JOIN objects o ON o.id=c.object_id "
-                "WHERE c.subj_key=? AND c.pred_key=? AND c.object_id!=? AND c.status='active' AND o.status IN ('active','superseded')",
-                (c["subj_key"], c["pred_key"], oid))
+                "WHERE c.subj_key=? AND c.pred_key=? AND c.object_id!=? AND c.status='active' AND o.status IN ('active','superseded') "
+                + ("" if cross_ok else "AND COALESCE(o.project,'')=COALESCE(?,'') ")
+                + "ORDER BY COALESCE(o.event_time, o.created_at) DESC LIMIT 3",      # compare with the most recent claims only (bounds O(n^2) edge growth)
+                (c["subj_key"], c["pred_key"], oid) + (() if cross_ok else (me["project"],)))
             for o in rows:
                 conflict = False
                 if c["functional"] and o["functional"] and c["val_key"] != o["val_key"] and c["polarity"] == o["polarity"] == 1:

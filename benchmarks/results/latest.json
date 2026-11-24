@@ -2,7 +2,7 @@
  "corpus": {
   "files": 40,
   "failures": [],
-  "ingest_seconds": 0.7
+  "ingest_seconds": 0.45
  },
  "graph": {
   "nodes": 106,
@@ -57,9 +57,9 @@
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "0 distractors in 4 queries",
    "latency_ms": {
-    "p50": 1.81,
-    "p95": 3.07,
-    "max": 5.38
+    "p50": 1.36,
+    "p95": 2.26,
+    "max": 4.2
    },
    "by_category": {
     "ambiguous": {
@@ -820,9 +820,9 @@
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "0 distractors in 4 queries",
    "latency_ms": {
-    "p50": 1.96,
-    "p95": 3.25,
-    "max": 3.79
+    "p50": 1.31,
+    "p95": 2.28,
+    "max": 2.64
    },
    "by_category": {
     "ambiguous": {
@@ -1583,9 +1583,9 @@
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "1 distractors in 4 queries",
    "latency_ms": {
-    "p50": 2.36,
-    "p95": 3.62,
-    "max": 4.2
+    "p50": 1.61,
+    "p95": 2.45,
+    "max": 3.21
    },
    "by_category": {
     "ambiguous": {
@@ -2393,9 +2393,9 @@
    "negative_queries_correctly_empty": "3/3",
    "distractor_leakage_top3": "1 distractors in 4 queries",
    "latency_ms": {
-    "p50": 2.63,
-    "p95": 4.54,
-    "max": 5.04
+    "p50": 1.77,
+    "p95": 3.01,
+    "max": 3.31
    },
    "by_category": {
     "ambiguous": {
@@ -2472,7 +2472,7 @@
       "atlas/payments-design.docx",
       "atlas/architecture.md",
       "atlas/capacity-plan.md",
-      "atlas/vendor-stripe.md"
+      "atlas/runbook-deploy.md"
      ],
      "n_items": 10,
      "p3": 0.3333333333333333,
@@ -2490,11 +2490,11 @@
       "atlas/runbook-deploy.md",
       "atlas/perf-report.pdf",
       "atlas/architecture.md",
-      "atlas/vendor-stripe.md",
       "atlas/api-conventions.md",
-      "atlas/kafka-evaluation.md"
+      "atlas/kafka-evaluation.md",
+      "atlas/capacity-plan.md"
      ],
-     "n_items": 9,
+     "n_items": 8,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -2643,7 +2643,7 @@
       "atlas/payments-design.docx",
       "atlas/capacity-plan.md",
       "personal/books-notes.md",
-      "personal/reading-list.md"
+      "atlas/architecture.md"
      ],
      "n_items": 10,
      "p3": 0.3333333333333333,
@@ -2829,8 +2829,8 @@
       "atlas/perf-report.pdf",
       "atlas/session-store-update.md",
       "atlas/db-decision.md",
-      "atlas/vendor-stripe.md",
-      "atlas/capacity-plan.md"
+      "atlas/capacity-plan.md",
+      "atlas/api-conventions.md"
      ],
      "n_items": 10,
      "p3": 0.3333333333333333,
@@ -2865,10 +2865,10 @@
       "atlas/perf-report.pdf",
       "atlas/payments-design.docx",
       "atlas/auth-service.md",
-      "atlas/vendor-stripe.md",
-      "atlas/capacity-plan.md"
+      "atlas/capacity-plan.md",
+      "atlas/postmortem-2025-03.md"
      ],
-     "n_items": 10,
+     "n_items": 9,
      "p3": 0.3333333333333333,
      "r3": 1.0,
      "r5": 1.0,
@@ -3213,12 +3213,12 @@
  "package": {
   "budget": 1500,
   "queries": 42,
-  "mean_package_tokens_est": 614.6,
-  "mean_selected_full_content_tokens_est": 174.9,
+  "mean_package_tokens_est": 606.2,
+  "mean_selected_full_content_tokens_est": 170.4,
   "entire_vault_tokens_est": 4915,
   "over_budget": 0,
-  "source_traceability": "151/151",
-  "items_with_explanation": "149/151",
+  "source_traceability": "149/149",
+  "items_with_explanation": "147/149",
   "conflicts_reported": "3/3"
  }
 }

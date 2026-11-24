@@ -48,6 +48,7 @@
   // ---------------------------------------------------------------- nav
   const views = ['graph', 'explore', 'search', 'intel', 'vault'];
   function show(v) {
+    if (matchMedia('(max-width:820px)').matches) closeDetail();          // on phones the detail is a sheet that must not cover other views
     views.forEach(x => { $('#view-' + x).classList.toggle('active', x === v); document.querySelector(`.nav[data-view="${x}"]`).classList.toggle('active', x === v); });
     ({ graph: () => graph && graph.resize(), explore: loadExplorer, search: () => $('#sQ').focus(), intel: loadIntel, vault: loadVault })[v]();
     location.hash = v;

@@ -96,3 +96,20 @@ def test_reindex_rebuilds_derived_data(brain):
     assert r["objects"] == 1
     assert st.embedding_of(o["id"]) is not None
     assert brain.db.one("SELECT COUNT(*) c FROM fts WHERE fts MATCH 'alpha'")["c"] == 1
+
+
+def test_embedding_cache_tracks_status_and_discards_rolled_back_state(brain):
+    st = brain.store
+    a = st.create_object(type="fact", title="Alpha", content="alpha beta gamma delta")
+    v = st.embedder.embed("alpha beta gamma delta")
+    assert [i for i, _ in st.similar(v, k=5)] == [a["id"]]
+    st.set_status(a["id"], "archived")
+    assert st.similar(v, k=5) == []                              # archived objects leave the candidate matrix
+    st.set_status(a["id"], "active")
+    assert [i for i, _ in st.similar(v, k=5)] == [a["id"]]
+    # a dry-run ingestion creates objects inside a transaction that is rolled back: no phantom vectors may survive
+    brain.ingest.ingest_bytes("d.md", b"# Dry\n\nAlpha beta gamma delta epsilon zeta eta theta content for the dry run only.", dry_run=True)
+    ids = [i for i, _ in st.similar(v, k=10)]
+    assert ids == [a["id"]] and st.count_objects() == 1
+    b = st.create_object(type="fact", title="Beta", content="alpha beta gamma delta epsilon")
+    assert {i for i, _ in st.similar(v, k=10)} == {a["id"], b["id"]}
